@@ -1,13 +1,13 @@
 # provers
 
 Proof backends for [eez-rollup0](https://github.com/eez-association/eez-rollup0).
-Each directory holds one prover with its own Cargo workspace, lockfile, reth
-and EVM versions, Docker image and CI workflow.
+Each backend family has its own Cargo workspace, lockfile and execution pins.
 
-| Directory | Prover |
+| Directory | Backends |
 | --- | --- |
-| [`stateless-ecdsa/`](stateless-ecdsa) | The stateless proof signer (`eez-proof-signer`). It re-executes each settlement window from execution witnesses with its own EVM and signs it with an ECDSA attestation key. |
+| [`ecdsa/`](ecdsa) | Stateless witness replay (`eez-proof-signer`) and a stateful revm follower (`eez-prover-stateful`), sharing settlement validation and ECDSA attestation. |
 
-A prover talks to the node only through the `prove.v1`/`prove.v2` gRPC
-contract. It uses the protocol crates from eez-rollup0 as git dependencies
-pinned to one eez-rollup0 commit.
+Composers communicate with both backends through `prove.v1` gRPC. Stateful
+proving embeds shared follower code from a pinned eez-rollup0 revision and owns
+its local L2 database. Both backends use this repository's `eez-prover-evm`.
+The ordinary follower binary remains in eez-rollup0.
