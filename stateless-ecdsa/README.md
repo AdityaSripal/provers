@@ -1,7 +1,7 @@
 # stateless-ecdsa
 
 The stateless proof signer. For each settlement window the composer streams the
-blocks, their execution witnesses and the postBatch over `prove.v2`. The signer
+blocks, their execution witnesses and the postBatch over `prove.v1`. The signer
 re-executes every block from its witness, checks the settlement, and signs the
 batch's public inputs with its ECDSA attestation key for `ECDSAProofSystem`.
 
@@ -54,7 +54,7 @@ commit: `eez-primitives`, `eez-protocol`, `eez-proof-signer`,
   exactly; eez-rollup0 reads it through its `provers/` submodule. Only this
   workspace records it.
 - `crates/eez-prover-stateless/tests/conformance/` holds copies of eez-rollup0's
-  `prove.v2` conformance vectors and replayer
+  `prove.v1` conformance vectors and replayer
   (`crates/eez-control-rpc/conformance/`), replayed against the real binary.
   Refresh them when moving to a newer eez-rollup0.
 
