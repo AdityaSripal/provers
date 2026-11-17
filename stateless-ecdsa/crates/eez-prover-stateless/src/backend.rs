@@ -223,6 +223,7 @@ impl Backend {
             transaction_state_checkpoints: checkpoints,
             post_state_root,
             settlement_evidence: SettlementBlockEvidence {
+                cumulative_gas_used: receipts.iter().map(|r| r.cumulative_gas_used).collect(),
                 system_sender_flags,
                 observed_outbound_events: observe_outbound_events(&receipts),
             },

@@ -7,6 +7,7 @@ rust-version.workspace = true
 description = "The EEZ EVM the stateless proof signer runs, kept in step with eez-rollup0's crates/eez-evm."
 
 [dependencies]
+eez-protocol.workspace = true
 eez-primitives.workspace = true
 alloy-consensus.workspace = true
 alloy-eips.workspace = true
