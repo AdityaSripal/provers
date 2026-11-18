@@ -21,6 +21,10 @@ ignore = [
     # it. The fix (>= 0.7.6) needs k256/p256 0.14, which alloy and revm don't
     # use yet.
     "RUSTSEC-2026-0387",
+    # imbl-sized-chunks double free when a stored element's `Drop` panics.
+    # The migrated reth tx pool stores plain transaction data; imbl pins 0.1.3.
+    # Keep this in sync with deny.toml and the root workspace's audit policy.
+    "RUSTSEC-2026-0292",
 ]
 
 [output]
