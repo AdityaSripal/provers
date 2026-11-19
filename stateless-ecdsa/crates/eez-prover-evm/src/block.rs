@@ -11,7 +11,7 @@ use alloy_evm::{
         spec::EthExecutorSpec,
     },
 };
-use eez_protocol::system_tx::ExecutionGroupState;
+use eez_primitives::ExecutionGroupState;
 use revm::context::result::ResultAndState;
 use revm::context_interface::Block as _;
 use revm::{Inspector, primitives::hardfork::SpecId};
@@ -111,7 +111,7 @@ where
         let (group_state, _) = self
             .group_state
             .after(recovered_tx.tx())
-            .map_err(BlockExecutionError::msg)?;
+            .map_err(BlockValidationError::msg)?;
         if let EezTxEnvelope::System(native) = recovered_tx.tx() {
             let expected = eez_primitives::system_tx_gas_limit(
                 self.ethereum.evm.block().gas_limit(),
@@ -138,7 +138,7 @@ where
     fn finish(self) -> Result<(Self::Evm, BlockExecutionResult<Receipt>), BlockExecutionError> {
         self.group_state
             .ensure_complete()
-            .map_err(BlockExecutionError::msg)?;
+            .map_err(BlockValidationError::msg)?;
         // L2 has no consensus-layer requests (EIP-6110/7002/7251), beacon
         // withdrawals, or mining rewards. Do not execute those transitions and
         // discard their output: even an empty request list can change state.

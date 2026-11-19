@@ -263,7 +263,7 @@ fn system(chain_id: u64, group: u64, value: u64) -> EezTxEnvelope {
         gas_limit: eez_primitives::SYSTEM_TX_GAS_CAP,
         to: EEZL2_ADDRESS,
         value: U256::from(value),
-        input: Bytes::from_static(&eez_protocol::entries::EXECUTE_INCOMING_SELECTOR),
+        input: Bytes::from_static(&eez_primitives::EXECUTE_INCOMING_SELECTOR),
     }
     .into()
 }

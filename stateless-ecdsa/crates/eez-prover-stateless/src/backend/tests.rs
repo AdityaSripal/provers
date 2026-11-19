@@ -688,7 +688,8 @@ fn checkpoint_plan_is_derived_from_recovered_transactions() {
         vec![TEST_SYSTEM_ADDRESS, Address::ZERO, TEST_SYSTEM_ADDRESS],
     );
 
-    let (plan, system_sender_flags) = CheckpointPlan::for_block(&recovered, TEST_SYSTEM_ADDRESS);
+    let (plan, system_sender_flags) =
+        CheckpointPlan::for_block(&recovered, TEST_SYSTEM_ADDRESS).unwrap();
 
     assert_eq!(system_sender_flags, [true, false, true]);
     // The anchor's candidate leads, then the pair ends.
@@ -696,16 +697,16 @@ fn checkpoint_plan_is_derived_from_recovered_transactions() {
         plan.positions(),
         [
             CheckpointAt::PreExecution,
-            CheckpointAt::Transaction(1),
+            CheckpointAt::Transaction(0),
             CheckpointAt::Transaction(2),
         ]
     );
 }
 
-/// Nonempty Sync blocks include the final transaction, activating Stateless's
-/// post-execution-neutrality check. Empty blocks need only the anchor checkpoint.
+/// Every delivery is a complete group; adjacent ordinary transactions do not
+/// change its checkpoint. Empty blocks need only the anchor checkpoint.
 #[test]
-fn checkpoint_plan_is_empty_or_ends_at_the_final_transaction() {
+fn checkpoint_plan_keeps_deliveries_separate_from_ordinary_transactions() {
     let system = || {
         <TransactionSigned as alloy_eips::Decodable2718>::decode_2718_exact(
             &hex::decode(SYSTEM_TX).unwrap(),
@@ -733,7 +734,7 @@ fn checkpoint_plan_is_empty_or_ends_at_the_final_transaction() {
                 },
             );
             let recovered = RecoveredBlock::new_unhashed(block, vec![TEST_SYSTEM_ADDRESS; width]);
-            let (plan, _) = CheckpointPlan::for_block(&recovered, TEST_SYSTEM_ADDRESS);
+            let (plan, _) = CheckpointPlan::for_block(&recovered, TEST_SYSTEM_ADDRESS).unwrap();
 
             if width == 0 {
                 assert_eq!(plan.positions(), [CheckpointAt::PreExecution]);
@@ -744,11 +745,11 @@ fn checkpoint_plan_is_empty_or_ends_at_the_final_transaction() {
                 continue;
             }
 
-            assert_eq!(
-                plan.positions().last(),
-                Some(&CheckpointAt::Transaction(width - 1)),
-                "shape {shape:?} did not plan its final transaction",
-            );
+            let mut expected = vec![CheckpointAt::PreExecution];
+            expected.extend(shape.iter().enumerate().filter_map(|(index, is_delivery)| {
+                is_delivery.then_some(CheckpointAt::Transaction(index))
+            }));
+            assert_eq!(plan.positions(), expected, "shape {shape:?}");
         }
     }
 }
@@ -776,7 +777,7 @@ fn checkpoint_plan_includes_every_inbound_boundary() {
             RecoveredBlock::new_unhashed(block, vec![TEST_SYSTEM_ADDRESS; transaction_count]);
 
         let (plan, system_sender_flags) =
-            CheckpointPlan::for_block(&recovered, TEST_SYSTEM_ADDRESS);
+            CheckpointPlan::for_block(&recovered, TEST_SYSTEM_ADDRESS).unwrap();
 
         assert_eq!(system_sender_flags, vec![true; transaction_count]);
         let mut expected = vec![CheckpointAt::PreExecution];
