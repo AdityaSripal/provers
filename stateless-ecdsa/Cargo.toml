@@ -13,7 +13,7 @@ members = [
 version = "0.1.0"
 edition = "2024"
 license = "MIT"
-rust-version = "1.95"
+rust-version = "1.96"
 
 [workspace.dependencies]
 # Protocol crates shared with the node, from eez-rollup0. They inherit their
