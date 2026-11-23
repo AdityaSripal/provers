@@ -6,7 +6,7 @@
 #   docker build -t eez-proof-signer stateless-ecdsa
 
 # ── chef base: toolchain + system deps ───────────────────────────────
-FROM rust:1.95-bookworm AS chef
+FROM rust:1.98.1-bookworm AS chef
 RUN apt-get update && apt-get install -y --no-install-recommends \
         clang libclang-dev pkg-config cmake libssl-dev git ca-certificates mold \
     && rm -rf /var/lib/apt/lists/* \
